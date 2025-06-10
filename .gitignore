@@ -1,0 +1,40 @@
+# Fichiers Git
+.gitmodules
+.git/
+
+# Fichiers système Windows
+Thumbs.db
+desktop.ini
+*.lnk
+
+# Fichiers temporaires
+*.tmp
+*.temp
+*~
+
+# Fichiers de configuration IDE
+.vscode/
+.idea/
+*.iml
+
+# Fichiers de dépendances
+node_modules/
+*.log
+
+# Fichiers de base de données
+*.db
+*.sqlite
+*.mdf
+*.ldf
+
+# Fichiers de sauvegarde
+*.bak
+*.backup
+
+# Fichiers de cache
+.cache/
+.tmp/
+
+# Fichiers de configuration utilisateur
+*.user
+*.suo 
