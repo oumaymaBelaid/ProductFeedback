@@ -26,7 +26,7 @@ Apollo Client - Client GraphQL pour React (pour les requêtes GraphQL)
 Cloner le dépôt
 
 
-git clone https://github.com/houssembs99/FeedbackProduct.git  
+git clone https://github.com/oumaymaBelaid/ProductFeedback.git  
 cd FeedbackProduct
 
 -Installer les dépendances
