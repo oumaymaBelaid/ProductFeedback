@@ -39,19 +39,30 @@ Le playground GraphQL sera disponible à l'adresse : http://localhost:4000/
 -Installer Apollo Client
 npm install @apollo/client graphql  
 
--Configurer Apollo Client
+-*Configurer Apollo Client
 
-// src/ApolloClient.js
-import { ApolloClient, InMemoryCache } from '@apollo/client';
+import { ApolloClient, InMemoryCache, createHttpLink } from '@apollo/client';
 
-const client = new ApolloClient({
-  uri: 'http://localhost:4004/graphql', // adapte si le port change
-  cache: new InMemoryCache(),
+const httpLink = createHttpLink({
+  uri: 'http://localhost:4004/graphql',
 });
 
-export default client;
+const client = new ApolloClient({
+  link: httpLink,
+  cache: new InMemoryCache(),
+  defaultOptions: {
+    watchQuery: {
+      errorPolicy: 'all',
+    },
+    query: {
+      errorPolicy: 'all',
+    },
+  },
+});
 
--Exemple de requête dans un composant React 
+export default client; 
+
+-*Exemple de requête dans un composant React 
 
 import React from 'react';
 import { useQuery, gql } from '@apollo/client';
