@@ -1,0 +1,230 @@
+Une entreprise SaaS développe des produits numériques
+1. Solution Proposée
+1.1 Analyse du Problème
+Problème Identifié :
+
+Absence de système centralisé pour collecter les retours utilisateurs
+
+Impossible d'analyser automatiquement les feedbacks (notes + commentaires)
+
+Difficulté à exploiter les données pour l'amélioration des produits
+
+Besoins Principaux :
+
+Centralisation des feedbacks
+
+Structure claire des données
+
+API moderne avec :
+
+Soumission de feedbacks
+
+Consultation par produit
+
+
+
+1.2  Identification des entites & relations
+ *Entites
+User:Un utilisateur identifié
+Product:Un produit numérique
+Feedback:Note + commentaire sur un produit
+
+ *Relations :
+Un User peut donner plusieurs Feedbacks.
+Un Product peut recevoir plusieurs Feedbacks.
+Un Feedback appartient à un User et à un Product.
+
+1.3  Liste des fonctionnalites (sous forme de web service GraphQL))
+1.3.1 Consultation des Données (Queries)
+Liste des produits
+products: [Product!]!
+Retourne tous les produits avec leurs notes moyennes et nombre de feedbacks
+
+Détail d'un produit
+product(id: ID!): Product
+Inclut les informations détaillées + feedbacks associés
+
+
+Profil utilisateur
+user(id: ID!): User
+Affiche l'historique des feedbacks donnés par l'utilisateur
+
+1.3.2. Opérations d'Écriture (Mutations)
+Gestion des produits
+createProduct(input: ProductInput!): Product!
+Requiert : nom, version ,description
+
+Gestion des utilisateurs
+createUser(input: UserInput!): User!
+Requiert : nom et email valide
+
+Soumission de feedback
+submitFeedback(input: FeedbackInput!): Feedback!
+Contrôle :
+
+Note entre 1 et 5 
+
+Commentaire 
+
+Vérification de l'existence du produit/utilisateur
+1.3.3 Fonctionnalités Spéciales
+Calcul automatique
+Le champ averageRating sur les produits se met à jour en temps réel
+
+ 2. Diagramme
+ 
+  class User {
+        <<Entity>>
+        +id: ID!
+        +name: String!
+        +email: String!
+        +createdAt: DateTime!
+		+feedbacks: [Feedback!]
+    }
+ 
+ class Product {
+        <<Entity>>
+        +id: ID!
+        +name: String!
+        +description: String
+	+feedbacks: [Feedback!]
+    }
+	
+ class Feedback {
+        <<Entity>>
+        +id: ID!
+        +rating: Int! (1-5)
+        +comment: String
+        +createdAt: DateTime!
+		+user: User!
+        +product: Product!
+    }
+
+   User "1" --> "*" Feedback : "donne"
+   Product "1" --> "*" Feedback : "reçoit"
+	
+3-Schéma GraphQL  (Requêtes & Réponses) 
+  type Query {
+    getAllUsers: [User]
+    getAllProducts: [Product]
+    getProduct(id: ID!): Product
+    getFeedbackByProduct(productId: ID!): [Feedback]
+    getFeedbackByUser(userId: ID!): [Feedback]
+    getAllFeedbacks: [Feedback!]!
+  }
+
+
+ type Mutation {
+    createUser(name: String!, email: String!): User
+    createProduct(name: String!, description: String): Product
+    createFeedback(userId: ID!, productId: ID!, rating: Int!, comment: String): Feedback
+  }
+
+
+# Response Types
+ type User {
+    id: ID!
+    name: String!
+    email: String!
+    feedbacks: [Feedback]
+  }
+
+ type Product {
+    id: ID!
+    name: String!
+    description: String
+    feedbacks: [Feedback]
+    averageRating: Float
+  }
+type Feedback {
+    id: ID!
+    rating: Int!
+    comment: String
+    date: String
+    user: User
+    product: Product
+  }
+
+*Exemples*
+*Requêtes (Queries)* :
+Récupérer tous les produits
+query {
+  getAllProducts {
+    id
+    name
+    description
+    averageRating
+  }
+}
+Récupérer tous les utilisateurs
+query {
+  getAllUsers {
+    id
+    name
+    email
+  }
+}
+
+
+
+
+*Mutations (avec variables) :*
+Créer un nouvel utilisateur
+mutation {
+  createUser(name: "ali", email: "ali@example.com") {
+    id
+    name
+    email
+  }
+}
+
+
+Créer un feedback
+mutation {
+  createFeedback(
+    userId: "0c907dfd-0a54-432a-807a-c6b096e9f409"
+    productId: "d60e1a1e-1624-4389-9889-b66956875da1"
+    rating: 4
+    comment: "Très bon produit"
+  ) {
+    id
+    rating
+    comment
+    user {
+      name
+    }
+    product {
+      name
+    }
+  }
+}
+
+*Réponses*
+//reponse de user
+{
+  "data": {
+    "createUser": {
+      "id": "0c907dfd-0a54-432a-807a-c6b096e9f409",
+      "name": "ali",
+      "email": "ali@example.com"
+    }
+  }
+}
+
+// Réponse de Feedback
+{
+  
+  "data": {
+    "createFeedback": {
+      "id": "9ce6ca06-2780-4ad9-95f4-4621bda0b69d",
+      "rating": 4,
+      "comment": "Très bon produit",
+      "user": {
+        "name": "ali"
+      },
+      "product": {
+        "name": "Produit 1"
+      }
+    }
+  }
+}
