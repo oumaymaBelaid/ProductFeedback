@@ -15,7 +15,7 @@ const CreateUser = () => {
   const [createUser, { loading }] = useMutation(CREATE_USER, {
     refetchQueries: [{ query: GET_ALL_USERS }],
     onCompleted: (data) => {
-      navigate(`/users/${data.createUser.id}`);
+      navigate('/users');
     },
     onError: (error) => {
       setErrors({ submit: error.message });

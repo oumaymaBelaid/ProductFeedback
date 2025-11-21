@@ -17,7 +17,7 @@ const ProductDetail = () => {
     return <div className="error">Erreur lors du chargement du produit: {error.message}</div>;
   }
 
-  const product = data?.getProduct;
+  const product = data?.product;
 
   if (!product) {
     return <div className="error">Produit non trouvé</div>;

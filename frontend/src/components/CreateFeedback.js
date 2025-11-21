@@ -21,7 +21,7 @@ const CreateFeedback = () => {
 
   const [createFeedback, { loading }] = useMutation(CREATE_FEEDBACK, {
     onCompleted: (data) => {
-      navigate(`/products/${data.createFeedback.product.id}`);
+      navigate('/products');
     },
     onError: (error) => {
       setErrors({ submit: error.message });

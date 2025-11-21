@@ -1,62 +1,48 @@
-const { users, products, feedbacks } = require('./data');
-const { v4: uuidv4 } = require('uuid');
+const { User, Product, Feedback } = require('../models');
 
 const resolvers = {
   Query: {
-    getAllUsers: () => users,
-    getAllProducts: () => products,
-    getProduct: (_, { id }) => products.find(p => p.id === id),
-    getFeedbackByProduct: (_, { productId }) => feedbacks.filter(f => f.productId === productId),
-    getFeedbackByUser: (_, { userId }) => feedbacks.filter(f => f.userId === userId),
-    getAllFeedbacks: () => feedbacks,
-    
-
+    getAllUsers: async () => await User.findAll(),
+    getAllProducts: async () => await Product.findAll(),
+    product: async (_, { id }) => await Product.findByPk(id),
+    feedbacks: async () => await Feedback.findAll(),
+    feedback: async (_, { id }) => await Feedback.findByPk(id),
+    user: async (_, { id }) => await User.findByPk(id),
+    getFeedbackByUser: async (_, { userId }) => await Feedback.findAll({ where: { UserId: userId } }),
   },
 
   Mutation: {
-    createUser: (_, { name, email }) => {
-      const newUser = { id: uuidv4(), name, email };
-      users.push(newUser);
+    createUser: async (_, { name, email }) => {
+      const newUser = await User.create({ name, email });
       return newUser;
     },
 
-    createProduct: (_, { name, description }) => {
-      const newProduct = { id: uuidv4(), name, description };
-      products.push(newProduct);
+    createProduct: async (_, { name, description }) => {
+      const newProduct = await Product.create({ name, description });
       return newProduct;
     },
 
-    createFeedback: (_, { userId, productId, rating, comment }) => {
-  console.log("Création feedback :", { userId, productId, rating, comment });
-      const newFeedback = {
-        id: uuidv4(),
-        userId,
-        productId,
+    createFeedback: async (_, { userId, productId, rating, comment }) => {
+      console.log("Création feedback :", { userId, productId, rating, comment });
+      const newFeedback = await Feedback.create({
+        UserId: userId,
+        ProductId: productId,
         rating,
         comment,
-        date: new Date().toISOString()
-      };
-      feedbacks.push(newFeedback);
+      });
       return newFeedback;
     },
   },
 
   Feedback: {
-  user: (feedback) => {
-    const user = users.find(u => u.id === feedback.userId);
-    if (!user) {
-      console.warn(`Utilisateur introuvable pour userId: ${feedback.userId}`);
-    }
-    return user;
+    user: async (feedback) => await User.findByPk(feedback.UserId),
+    product: async (feedback) => await Product.findByPk(feedback.ProductId),
   },
-  product: (feedback) => products.find(p => p.id === feedback.productId),
-},
-
 
   Product: {
-    feedbacks: (product) => feedbacks.filter(f => f.productId === product.id),
-    averageRating: (product) => {
-      const prodFeedbacks = feedbacks.filter(f => f.productId === product.id);
+    feedbacks: async (product) => await Feedback.findAll({ where: { ProductId: product.id } }),
+    averageRating: async (product) => {
+      const prodFeedbacks = await Feedback.findAll({ where: { ProductId: product.id } });
       if (prodFeedbacks.length === 0) return null;
       const total = prodFeedbacks.reduce((sum, f) => sum + f.rating, 0);
       return total / prodFeedbacks.length;
@@ -64,9 +50,8 @@ const resolvers = {
   },
 
   User: {
-    feedbacks: (user) => feedbacks.filter(f => f.userId === user.id),
+    feedbacks: async (user) => await Feedback.findAll({ where: { UserId: user.id } }),
   }
-  
 };
 
 module.exports = resolvers;

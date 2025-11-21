@@ -28,12 +28,13 @@ const typeDefs = gql`
   }
 
   type Query {
-    getAllUsers: [User]
-    getAllProducts: [Product]
-    getProduct(id: ID!): Product
-    getFeedbackByProduct(productId: ID!): [Feedback]
-    getFeedbackByUser(userId: ID!): [Feedback]
-    getAllFeedbacks: [Feedback!]!
+    getAllUsers: [User!]!
+    getAllProducts: [Product!]!
+    product(id: ID!): Product
+    feedbacks: [Feedback!]!
+    feedback(id: ID!): Feedback
+    user(id: ID!): User
+    getFeedbackByUser(userId: ID!): [Feedback!]!
   }
 
   type Mutation {

@@ -34,18 +34,19 @@ export const GET_ALL_PRODUCTS = gql`
 
 export const GET_PRODUCT = gql`
   query GetProduct($id: ID!) {
-    getProduct(id: $id) {
+    product(id: $id) {
       id
       name
       description
-      averageRating
       feedbacks {
         id
         rating
         comment
+        date
         user {
           id
           name
+          email
         }
       }
     }
@@ -53,12 +54,13 @@ export const GET_PRODUCT = gql`
 `;
 
 // Requêtes pour les feedbacks
-export const GET_FEEDBACK_BY_PRODUCT = gql`
-  query GetFeedbackByProduct($productId: ID!) {
-    getFeedbackByProduct(productId: $productId) {
+export const GET_FEEDBACKS = gql`
+  query GetFeedbacks {
+    feedbacks {
       id
       rating
       comment
+      date
       user {
         id
         name
@@ -67,6 +69,7 @@ export const GET_FEEDBACK_BY_PRODUCT = gql`
       product {
         id
         name
+        description
       }
     }
   }
@@ -85,4 +88,24 @@ export const GET_FEEDBACK_BY_USER = gql`
       }
     }
   }
-`; 
+`;
+
+export const GET_USER = gql`
+  query GetUser($id: ID!) {
+    user(id: $id) {
+      id
+      name
+      email
+      feedbacks {
+        id
+        rating
+        comment
+        product {
+          id
+          name
+          description
+        }
+      }
+    }
+  }
+`;

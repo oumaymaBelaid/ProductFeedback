@@ -1,27 +1,35 @@
 import React from 'react';
 import { useQuery } from '@apollo/client';
 import { useParams, Link } from 'react-router-dom';
-import { GET_FEEDBACK_BY_USER } from '../graphql/queries';
+import { GET_FEEDBACK_BY_USER, GET_USER } from '../graphql/queries';
 
 const UserDetail = () => {
   const { id } = useParams();
-  const { data, loading, error } = useQuery(GET_FEEDBACK_BY_USER, {
+  const { data: userData, loading: userLoading, error: userError } = useQuery(GET_USER, {
+    variables: { id }
+  });
+  const { data: feedbackData, loading: feedbackLoading, error: feedbackError } = useQuery(GET_FEEDBACK_BY_USER, {
     variables: { userId: id }
   });
 
-  if (loading) {
+  if (userLoading || feedbackLoading) {
     return <div className="loading">Chargement des données utilisateur...</div>;
   }
 
-  if (error) {
-    return <div className="error">Erreur lors du chargement des données: {error.message}</div>;
+  if (userError || feedbackError) {
+    return <div className="error">Erreur lors du chargement des données: {userError?.message || feedbackError?.message}</div>;
   }
 
-  const feedbacks = data?.getFeedbackByUser || [];
+  const user = userData?.user;
+  const feedbacks = feedbackData?.getFeedbackByUser || [];
+
+  if (!user) {
+    return <div className="error">Utilisateur non trouvé</div>;
+  }
 
   // Calculer les statistiques de l'utilisateur
   const totalFeedbacks = feedbacks.length;
-  const averageRating = totalFeedbacks > 0 
+  const averageRating = totalFeedbacks > 0
     ? (feedbacks.reduce((total, feedback) => total + feedback.rating, 0) / totalFeedbacks).toFixed(1)
     : 0;
 

@@ -15,7 +15,7 @@ const CreateProduct = () => {
   const [createProduct, { loading }] = useMutation(CREATE_PRODUCT, {
     refetchQueries: [{ query: GET_ALL_PRODUCTS }],
     onCompleted: (data) => {
-      navigate(`/products/${data.createProduct.id}`);
+      navigate('/products');
     },
     onError: (error) => {
       setErrors({ submit: error.message });
